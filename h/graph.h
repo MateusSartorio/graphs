@@ -5,22 +5,32 @@
 
 using namespace std;
 
-struct node {
-    private:
-        string name;
-        vector<node*> adj;
-        // vector<int> v;
-    
-    public:
-        node(string name);
-        // ~node();
+struct node;
 
-        string to_string();    
+struct adjacency {
+    public:
+        node* n;
+        double weight;
+
+        adjacency(node* n, double weight);
+};
+
+struct node {
+    public:
+        string name;
+        vector<adjacency> adj;
+    
+        node(string name);
+        ~node();
+
+        string to_string();
+
+        void add_adjacency(node& n, double weight);   
 };
 
 struct graph {
     private:
-        vector<node> vertices;
+        vector<node> nodes;
         unsigned int size;
 
     public:
@@ -29,6 +39,13 @@ struct graph {
 
         string to_string();
 
-        graph& add_node(string name);
-        graph& add_node(node n);
+        void add_node(string name);
+        void add_node(node n);
+
+        void add_edge(node& n1, node& n2, double weight);
+        void add_edge(string n1, string n2, double weight);
 };
+
+// ostream& operator<<(ostream& os, graph& g) {
+//     return cout << g.to_string() << endl;
+// }
