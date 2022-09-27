@@ -10,19 +10,27 @@ node::node(string name) {
 }
 
 node::~node() {
-
+    //Nothing to do in here
 }
 
 string node::to_string() {
-    string str = "name: " + this->name + ", ";
+    string str = this->name;
 
-    for(adjacency a : this->adj)
-        str += a.n->to_string() + ", " + std::to_string(a.weight) + ", ";
+    if(!this->adj.empty()) {
+        str += " | ";
+        for(adjacency a : this->adj)
+            str += "(" + a.n->name + ", " + std::to_string(a.weight) + "), ";
+    }
+    else
+        str += " | no adjacencies";
 
     return str;
 }
 
 void node::add_adjacency(node& n, double weight) {
+    if(!this->name.compare(n.name))
+        return;
+
     this->adj.push_back(adjacency(&n, weight));
 }
 
@@ -36,8 +44,9 @@ graph::~graph() {
 }
 
 string graph::to_string() {
-    string str = "===================================\n";
+    string str = "==================================\n";
     str += "size: " + std::to_string(size) + "\n";
+    str += "----------------------------------\n"; 
 
     for(node& n : this->nodes)
         str += n.to_string() + "\n";
@@ -47,6 +56,10 @@ string graph::to_string() {
 }
 
 void graph::add_node(node n) {
+    for(node n_temp : this->nodes)
+        if(!n_temp.name.compare(n.name))
+            return;
+
     this->nodes.push_back(n);
     this->size++;
 }
@@ -56,13 +69,34 @@ void graph::add_node(string name) {
 }
 
 void graph::add_edge(node& n1, node& n2, double weight) {
+    for(adjacency& a : n1.adj)
+        if(!a.n->name.compare(n2.name))
+            return;
+    
     n1.add_adjacency(n2, weight);
 }
 
 void graph::add_edge(string n1, string n2, double weight) {    
-    for(node n : this->nodes)
-        if(!n1.compare(n.name))
-            for(adjacency a : n.adj) 
-                if(!a.n->name.compare(n2))
-                    this->add_edge(n, *a.n, weight);
+    node* node1 = nullptr;
+    node* node2 = nullptr;
+    int count = 0;
+
+    for(node& n : this->nodes) {
+        if(!n1.compare(n.name)) {
+            node1 = &n;
+            count++;
+        }
+        else if(!n2.compare(n.name)) {
+            node2 = &n;
+            count++;
+        }
+        
+        if(count == 2)
+            break;
+    }
+
+    if(count < 2)
+        return;    
+    
+    this->add_edge(*node1, *node2, weight);
 }
