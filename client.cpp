@@ -12,9 +12,10 @@ int main(int argc, char** argv) {
     g.add_node("c");
 
     g.add_edge("a", "b", 1);
+    g.add_edge("a", "c", 3);
     g.add_edge("b", "a", 2);
 
-    cout << g.to_string() << endl;
+    cout << g << endl;
 
     return 0;
 }

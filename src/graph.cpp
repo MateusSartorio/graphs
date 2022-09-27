@@ -18,8 +18,9 @@ string node::to_string() {
 
     if(!this->adj.empty()) {
         str += " | ";
-        for(adjacency a : this->adj)
+        for(adjacency a : this->adj) {
             str += "(" + a.n->name + ", " + std::to_string(a.weight) + "), ";
+        }
     }
     else
         str += " | no adjacencies";
@@ -99,4 +100,18 @@ void graph::add_edge(string n1, string n2, double weight) {
         return;    
     
     this->add_edge(*node1, *node2, weight);
+}
+
+void graph::dfs_componentes_nao_conectados() {
+    int c = 0;
+
+    for(node& n : this->nodes)
+}
+
+void graph::dfs() {
+
+}
+
+ostream& operator<<(ostream& os, graph& g) {
+    return cout << g.to_string();
 }
