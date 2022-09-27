@@ -7,6 +7,11 @@ adjacency::adjacency(node* n, double weight) {
 
 node::node(string name) {
     this->name = name;
+
+    this->visited = false;
+    this->finished = false;
+    this->parent = nullptr;
+    this->component = 0;
 }
 
 node::~node() {
@@ -36,8 +41,10 @@ void node::add_adjacency(node& n, double weight) {
 }
 
 
-graph::graph() {
+graph::graph(bool is_directed, bool is_weighted) {
     this->size = 0;
+    this->is_directed = is_directed;
+    this->is_weighted = is_weighted;
 }
 
 graph::~graph() {
@@ -69,6 +76,11 @@ void graph::add_node(string name) {
     this->add_node(node(name));
 }
 
+void graph::add_node(string nodes[], int n) {
+    for(int i = 0; i < n; i++)
+        this->add_node(nodes[i]);
+}
+
 void graph::add_edge(node& n1, node& n2, double weight) {
     for(adjacency& a : n1.adj)
         if(!a.n->name.compare(n2.name))
@@ -97,19 +109,68 @@ void graph::add_edge(string n1, string n2, double weight) {
     }
 
     if(count < 2)
-        return;    
+        return;
+
+    if(!this->is_weighted)
+        weight = 1.0;
     
     this->add_edge(*node1, *node2, weight);
+    if(!this->is_directed)
+        this->add_edge(*node2, *node1, weight);
+}
+
+void graph::dfs(node& n, int c) {
+    n.visited = true;
+    n.component = c;
+
+    for(adjacency& a : n.adj) {
+        node& m = *a.n;
+
+        if(!m.visited) {
+            m.parent = &n;
+            cout << "parent of " << m.name << " is " << n.name << endl;
+            dfs(m, c);
+        }
+        // else if(m.visited && !m.finished)
+        //     cout << "(" << n.name << ", " << m.name << ") is a returning edge" << endl;
+    }
+    n.finished = true;
 }
 
 void graph::dfs_componentes_nao_conectados() {
     int c = 0;
 
+    for(node& n : this->nodes) {
+        n.visited = false;
+        n.finished = false;
+        n.parent = nullptr;
+    }
+
     for(node& n : this->nodes)
+        if(!n.visited) {
+            c++;
+            dfs(n, c);
+        }
 }
 
-void graph::dfs() {
+void graph::directed_dfs(node& n, int& time) {
+    n.visited = true;
+    time++;
+    
+}
 
+void graph::directed_dfs() {
+    for(node& n : this->nodes) {
+        n.visited = false;
+        n.finished = false;
+        n.parent = nullptr;
+    }
+
+    int time = 0;
+
+    for(node& n : this->nodes)
+        if(!n.visited)
+            directed_dfs(n);
 }
 
 ostream& operator<<(ostream& os, graph& g) {
